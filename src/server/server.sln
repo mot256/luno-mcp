@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LunoMcpServer", "LunoMcpServer\LunoMcpServer.csproj", "{5B7FAD67-0764-9D01-A6E7-9291EBC24683}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B7FAD67-0764-9D01-A6E7-9291EBC24683}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B7FAD67-0764-9D01-A6E7-9291EBC24683}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B7FAD67-0764-9D01-A6E7-9291EBC24683}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B7FAD67-0764-9D01-A6E7-9291EBC24683}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FB2F4236-2A42-44E8-A4D4-D2576ECDC89E}
+	EndGlobalSection
+EndGlobal
