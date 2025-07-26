@@ -9,13 +9,11 @@ public record AuditLogEntry(string Timestamp, string Action, string User, string
 public abstract class BackgroundAuditLoggerBase : BackgroundService
 {
     private readonly Channel<AuditLogEntry> _channel;
-    private readonly int _maxQueueSize;
     private readonly int _batchSize;
     private readonly ILogger? _logger;
 
     protected BackgroundAuditLoggerBase(int maxQueueSize = 1000, int batchSize = 32, ILogger? logger = null)
     {
-        _maxQueueSize = maxQueueSize;
         _batchSize = batchSize;
         _logger = logger;
         _channel = Channel.CreateBounded<AuditLogEntry>(new BoundedChannelOptions(maxQueueSize)
@@ -31,6 +29,7 @@ public abstract class BackgroundAuditLoggerBase : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _logger?.LogInformation("Starting background audit logger service");
         var batch = new List<AuditLogEntry>(_batchSize);
         try
         {
@@ -60,6 +59,8 @@ public abstract class BackgroundAuditLoggerBase : BackgroundService
                 if (_channel.Reader.Completion.IsCompleted)
                     break;
             }
+
+            _logger?.LogInformation("Background audit logger service stopped gracefully");
         }
         catch (Exception ex)
         {

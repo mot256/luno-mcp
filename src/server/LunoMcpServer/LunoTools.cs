@@ -12,13 +12,13 @@ public class LunoTools
 {
     private readonly IAuditLogger _auditLogger;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IConfiguration _configuration;
 
-    public LunoTools(IHttpClientFactory httpClientFactory, IAuditLogger auditLogger, IHttpContextAccessor httpContextAccessor)
+    public LunoTools(IHttpClientFactory httpClientFactory, IAuditLogger auditLogger, IConfiguration configuration)
     {
         _httpClientFactory = httpClientFactory;
         _auditLogger = auditLogger;
-        _httpContextAccessor = httpContextAccessor;
+        _configuration = configuration;
     }
 
     private Task LogAuditAsync(string action, string details)
@@ -35,8 +35,8 @@ public class LunoTools
 
     private (string apiKeyId, string apiKeySecret) GetCredentials()
     {
-        var apiKeyId = Environment.GetEnvironmentVariable("LUNO_API_KEY_ID");
-        var apiKeySecret = Environment.GetEnvironmentVariable("LUNO_API_KEY_SECRET");
+        var apiKeyId = _configuration["LUNO_API_KEY_ID"] ?? Environment.GetEnvironmentVariable("LUNO_API_KEY_ID");
+        var apiKeySecret = _configuration["LUNO_API_KEY_SECRET"] ?? Environment.GetEnvironmentVariable("LUNO_API_KEY_SECRET");
         if (string.IsNullOrWhiteSpace(apiKeyId) || string.IsNullOrWhiteSpace(apiKeySecret))
             throw new InvalidOperationException("Luno API credentials are not set in environment variables.");
         return (apiKeyId, apiKeySecret);

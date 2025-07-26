@@ -1,48 +1,38 @@
 ﻿using System.Reflection;
-using System.Threading.RateLimiting;
 using LunoMcpServer;
 using LunoMcpServer.Audit;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
+
+var builder = Host.CreateApplicationBuilder(args);
+builder.Logging
+.AddConsole(o =>
+{    
+    // Configure all logs to go to stderr
+    // This is needed to ensure that all logs are shown on the console for debugging purposes.
+    // But also to ensure that the MCP client receives replies via the STDOUT (see MCP spec ).
+    o.LogToStandardErrorThreshold = Microsoft.Extensions.Logging.LogLevel.Trace;
+}).SetMinimumLevel(Debugger.IsAttached ? Microsoft.Extensions.Logging.LogLevel.Trace : Microsoft.Extensions.Logging.LogLevel.Error);
 
 
-
-var builder = WebApplication.CreateBuilder(args);
-
+builder.Configuration.AddUserSecrets<Program>();
 builder.Services.AddHttpClient();
-// Add MCP HTTP server services
-builder.Services.AddMcpServer(o =>
-    {
-        // Configure options here
-        o.ServerInfo = new ModelContextProtocol.Protocol.Implementation
-        {
-            Name = "Luno MCP Server",
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown",
-            Title = "Luno MCP Server"
-        };
-    })
-    .WithHttpTransport()
-    .WithToolsFromAssembly();
-
-// Register audit logger as singleton and hosted service using same instance
 builder.Services.AddSingleton<FileAuditLogger>();
 builder.Services.AddSingleton<IAuditLogger>(sp => sp.GetRequiredService<FileAuditLogger>());
 builder.Services.AddHostedService(sp => sp.GetRequiredService<FileAuditLogger>());
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<LunoTools>();
 
-// Add Basic Authentication
-builder.Services.AddAuthorization();
-/*builder.Services.AddAuthentication("Basic")
-    .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
-*/
-var app = builder.Build();
+builder.Services.AddMcpServer(o =>
+{
+    o.ServerInfo = new ModelContextProtocol.Protocol.Implementation
+    {
+        Name = "Luno MCP Server",
+        Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown",
+        Title = "Luno MCP Server"
+    };
+})
+    .WithStdioServerTransport()
+    .WithToolsFromAssembly();
 
-// Use authentication/authorization middleware
-//app.UseAuthentication();
-//app.UseAuthorization();
-
-// Map MCP HTTP server endpoints
-app.MapMcp();//.RequireAuthorization();
-
-app.Run();
+var host = builder.Build();
+await host.RunAsync();

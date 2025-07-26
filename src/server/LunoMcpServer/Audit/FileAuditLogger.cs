@@ -4,8 +4,8 @@ public class FileAuditLogger : BackgroundAuditLoggerBase, IAuditLogger
 {
     private readonly string _logPath;
 
-    public FileAuditLogger(string? logPath = null)
-        : base()
+    public FileAuditLogger(ILogger<FileAuditLogger>? logger, string? logPath = null)
+        : base(logger: logger, maxQueueSize: 1000, batchSize: 32)
     {
         _logPath = logPath ?? Path.Combine(AppContext.BaseDirectory, "audit.log");
     }
