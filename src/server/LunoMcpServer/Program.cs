@@ -32,7 +32,7 @@ builder.Services.AddMcpServer(o =>
     };
 })
     .WithStdioServerTransport()
-    .WithToolsFromAssembly();
+    .WithTools<LunoTools>();
 
 var host = builder.Build();
 await host.RunAsync();
